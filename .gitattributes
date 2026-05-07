@@ -1,0 +1,2 @@
+# This file defines consistent line endings for text files, regardless of the operating system.
+* text=auto eol=lf
