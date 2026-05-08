@@ -2,7 +2,7 @@ import { expect, Page, test } from '@playwright/test';
 
 type Student = { name: string, grade: number };
 
-const courseCode = 'SOF009AS3A-3012';
+const courseCode = 'SOF000AS0A-3000';
 
 const students: Student[] = [
     { name: "John Doe", grade: 5 }
