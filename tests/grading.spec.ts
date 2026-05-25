@@ -2,19 +2,19 @@ import { expect, Page, test } from '@playwright/test';
 
 type Student = { name: string, grade: number };
 
-const courseCode = 'SOF000AS0A-3000';
+const courseCode = 'SOF004AS2A-3000';
+const gradingPage = `https://teacher.home.haaga-helia.fi/group/opettajan-tyopoyta/toteutuksen-arviointi?p_p_id=AssessmentManagementPortlet_WAR_assessmentmanagementportlet&p_p_lifecycle=0&_AssessmentManagementPortlet_WAR_assessmentmanagementportlet_struts.portlet.action=%2Fassessment%2Fassessment&realizationCode=${courseCode}`;
 
 const students: Student[] = [
-    { name: "John Doe", grade: 5 }
+    { name: "John Doe", grade: 0 }
 ];
+
 
 test(`Set grades for all students in ${courseCode}`, async ({ page }) => {
     test.setTimeout(60_000);
 
-    await page.goto('https://teacher.home.haaga-helia.fi/');
-    await page.getByRole('link', { name: courseCode }).click();
+    await page.goto(gradingPage);
 
-    await page.getByRole('link', { name: 'Arvioinnit' }).click();
     await expect(page).toHaveTitle(/arviointi/i);
 
     await expect(page.locator("tr[data-student-name]").first()).toBeVisible();
@@ -32,7 +32,7 @@ async function setStudentGrade(student: Student, page: Page) {
 
     const studentRow = page.locator(`tr[data-student-name='${name}']`);
     const selectElement = studentRow.locator(".grade-select");
-    const statusCompleted = studentRow.locator(".status-completed");
+    const statusEnrolled = studentRow.locator(".status-enrolled");
 
     if (await studentRow.count() === 1) {
         const currentGrade = await selectElement.inputValue();
@@ -40,11 +40,11 @@ async function setStudentGrade(student: Student, page: Page) {
         if (currentGrade === "NULL") {
             console.log(`Setting ${grade} for ${name}`);
 
-            await expect(statusCompleted).not.toBeVisible();
+            await expect(statusEnrolled).toBeVisible();
 
             await selectElement.selectOption(grade.toString());
 
-            await expect(statusCompleted).toBeVisible();
+            await expect(statusEnrolled).not.toBeVisible({ timeout: 10_000 });
 
             console.log(`${name} successfully graded ${grade}`);
 
