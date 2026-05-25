@@ -1,4 +1,4 @@
-import { expect, Page, test } from '@playwright/test';
+import { expect, Locator, test } from '@playwright/test';
 
 type Student = { name: string, grade: number };
 
@@ -21,28 +21,26 @@ test(`Set grades for all students in ${courseCode}`, async ({ page }) => {
 
     for (let student of students) {
         await test.step(`Setting grade for ${student.name}`, async () => {
-            await setStudentGrade(student, page);
+            const studentRow = page.locator(`tr[data-student-name='${student.name}']`);
+            await setStudentGrade(student, studentRow);
         });
     }
 });
 
 
-async function setStudentGrade(student: Student, page: Page) {
-    const { name, grade } = student;
-
-    const studentRow = page.locator(`tr[data-student-name='${name}']`);
-    const selectElement = studentRow.locator(".grade-select");
+async function setStudentGrade({ name, grade }: Student, studentRow: Locator) {
+    const gradeSelect = studentRow.locator(".grade-select");
     const statusEnrolled = studentRow.locator(".status-enrolled");
 
     if (await studentRow.count() === 1) {
-        const currentGrade = await selectElement.inputValue();
+        const currentGrade = await gradeSelect.inputValue();
 
         if (currentGrade === "NULL") {
             console.log(`Setting ${grade} for ${name}`);
 
             await expect(statusEnrolled).toBeVisible();
 
-            await selectElement.selectOption(grade.toString());
+            await gradeSelect.selectOption(grade.toString());
 
             await expect(statusEnrolled).not.toBeVisible();
 
@@ -55,4 +53,3 @@ async function setStudentGrade(student: Student, page: Page) {
         console.warn(`${name} was not found on the page`);
     }
 }
-
