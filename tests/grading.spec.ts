@@ -44,7 +44,7 @@ async function setStudentGrade(student: Student, page: Page) {
 
             await selectElement.selectOption(grade.toString());
 
-            await expect(statusEnrolled).not.toBeVisible({ timeout: 10_000 });
+            await expect(statusEnrolled).not.toBeVisible();
 
             console.log(`${name} successfully graded ${grade}`);
 
